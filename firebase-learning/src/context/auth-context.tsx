@@ -23,8 +23,12 @@ export default function AuthContextFunc({ children }: AuthContextFuncType) {
     onAuthStateChanged(auth, (loggedInUser) => {
       if (loggedInUser) {
         const { email, emailVerified, uid } = loggedInUser;
-        setUserAcUs({ email, emailVerified, uid });
-        route.push("home");
+        if (!emailVerified) {
+          route.push("verify-email");
+        } else {
+          setUserAcUs({ email, emailVerified, uid });
+          route.push("home");
+        }
       } else {
         setUserAcUs(null);
         route.push("/");

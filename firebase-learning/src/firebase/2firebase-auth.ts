@@ -1,7 +1,9 @@
 import {
   createUserWithEmailAndPassword,
   getAuth,
+  sendEmailVerification,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { app } from "./1firebaseconfig";
 
@@ -61,4 +63,27 @@ export function serviceSignInUser(userSi: ServiceSignInUser) {
         "Inside SignUp"
       );
     });
+}
+
+export function serviceSignOut() {
+  signOut(auth)
+    .then(() => {
+      console.log("User logged out");
+    })
+    .catch((error) => {
+      console.log("error=>", error);
+    });
+}
+
+export function serviceSendEmailVerification() {
+  if (auth.currentUser) {
+    sendEmailVerification(auth.currentUser)
+      .then(() => {
+        console.log("email sent insid fun emf");
+      })
+      .catch(() => {
+        console.log("error inside func emf");
+      });
+  } else {
+  }
 }
