@@ -6,7 +6,22 @@ export default function ButtonComponents({
 }: ButtonComponentsType) {
   return (
     <>
-      <button onClick={btnHandler}>{btnLabel}</button>
+      <button
+        onClick={btnHandler}
+        style={{
+          padding: "7px 10px",
+          backgroundColor: "#4267B2",
+          border: "none",
+          borderRadius: "5px",
+          fontSize: "16px",
+          fontWeight: "bolder",
+          color: "white",
+          transition: "background-color 0.3s",
+          cursor: "pointer",
+        }}
+      >
+        {btnLabel}
+      </button>
     </>
   );
 }

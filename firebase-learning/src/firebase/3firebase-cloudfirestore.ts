@@ -1,4 +1,10 @@
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getFirestore,
+  setDoc,
+} from "firebase/firestore";
 import { app } from "./1firebaseconfig";
 import { getAuth } from "firebase/auth";
 
@@ -17,5 +23,17 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
     await setDoc(docRef, userCf);
   } catch (error) {
     console.log("error=>", error, "serviceSaveUser()");
+  }
+}
+
+export async function serviceSaveToDo(ToDo: string) {
+  const UserUid = auth.currentUser?.uid;
+  const ToDos = { ToDo, UserUid };
+  let collectionRef = collection(db, "todos");
+  try {
+    await addDoc(collectionRef, ToDos);
+    console.log("serviceSaveToDo() triggerd");
+  } catch (error) {
+    console.log("error=> Inside serviceSaveToDo", error);
   }
 }
