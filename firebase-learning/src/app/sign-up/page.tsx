@@ -8,9 +8,29 @@ import { serviceSignUpUser } from "@/firebase/2firebase-auth";
 export default function LoginUserFunc() {
   const [emailSuUs, setEmailSuUs] = useState<string>("");
   const [passwordSuUs, setPasswordSuUs] = useState<string>("");
+  const [userNameSuUs, setUserNameSuUs] = useState<string>("");
+  const [rollNumSuUs, setRollNumSuUs] = useState<string>("");
   return (
     <>
       <h1>Signup Here</h1>
+      <label htmlFor="rollNumSuUs">Roll Number:</label>
+      <input
+        type="text"
+        id="rollNumSuUs"
+        value={rollNumSuUs}
+        onChange={(e) => setRollNumSuUs(e.target.value)}
+      />
+      <br />
+      <br />
+      <label htmlFor="userNameSuUs">User Name:</label>
+      <input
+        type="text"
+        id="userNameSuUs"
+        value={userNameSuUs}
+        onChange={(e) => setUserNameSuUs(e.target.value)}
+      />
+      <br />
+      <br />
       <label htmlFor="email">Email:</label>
       <input
         type="email"
@@ -32,7 +52,12 @@ export default function LoginUserFunc() {
       <ButtonComponents
         btnLabel={"Signup"}
         btnHandler={() => {
-          serviceSignUpUser({ email: emailSuUs, password: passwordSuUs });
+          serviceSignUpUser({
+            email: emailSuUs,
+            password: passwordSuUs,
+            rollNum: rollNumSuUs,
+            userName: userNameSuUs,
+          });
         }}
       />
       <br />

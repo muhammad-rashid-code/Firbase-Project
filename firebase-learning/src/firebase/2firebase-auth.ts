@@ -6,14 +6,22 @@ import {
   signOut,
 } from "firebase/auth";
 import { app } from "./1firebaseconfig";
+import { serviceSaveUser } from "./3firebase-cloudfirestore";
 
 const auth = getAuth(app);
 
-type ServiceSignUpUserType = { email: string; password: string };
+type ServiceSignUpUserType = {
+  email: string;
+  password: string;
+  userName: string;
+  rollNum: string;
+};
 export function serviceSignUpUser(userSu: ServiceSignUpUserType) {
-  createUserWithEmailAndPassword(auth, userSu.email, userSu.password)
+  const { email, password, rollNum, userName } = userSu;
+  createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       const { email, emailVerified, uid } = userCredential.user;
+      serviceSaveUser({ email: email as string, userName, rollNum, uid });
       console.log(
         "email=>",
         email,
@@ -23,6 +31,10 @@ export function serviceSignUpUser(userSu: ServiceSignUpUserType) {
         emailVerified,
         "Inside SignUp"
       );
+      if (auth.currentUser) {
+        sendEmailVerification(auth.currentUser);
+        console.log("inside=> signUp User");
+      }
     })
     .catch((error) => {
       const errorMessage = error.message;
