@@ -8,7 +8,7 @@ import {
 import { app } from "./1firebaseconfig";
 import { serviceSaveUser } from "./3firebase-cloudfirestore";
 
-const auth = getAuth(app);
+export const auth = getAuth(app);
 
 type ServiceSignUpUserType = {
   email: string;

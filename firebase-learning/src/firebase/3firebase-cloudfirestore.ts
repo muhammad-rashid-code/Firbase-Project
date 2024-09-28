@@ -8,7 +8,7 @@ import {
 import { app } from "./1firebaseconfig";
 import { getAuth } from "firebase/auth";
 
-const db = getFirestore(app);
+export const db = getFirestore(app);
 const auth = getAuth(app);
 
 type ServiceSaveUserType = {
@@ -26,14 +26,34 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
   }
 }
 
+// export async function serviceSaveToDo(ToDo: string) {
+//   const UserUid = auth.currentUser?.uid;
+//   const ToDos = { ToDo, UserUid };
+//   let collectionRef = collection(db, "todos");
+//   try {
+//     await addDoc(collectionRef, ToDos);
+//     console.log("serviceSaveToDo() triggerd");
+//   } catch (error) {
+//     console.log("error=> Inside serviceSaveToDo", error);
+//   }
+// }
+
+///
+
+// Check serviceSaveToDo: Ensure that when you add a new
+// to-do, it has the correct uid associated with it. If the uid is incorrect
+// or missing, the listener won’t pick it up.
+
+// Here's how your serviceSaveToDo should look:
+
 export async function serviceSaveToDo(ToDo: string) {
   const UserUid = auth.currentUser?.uid;
-  const ToDos = { ToDo, UserUid };
-  let collectionRef = collection(db, "todos");
+  const ToDos = { uid: UserUid, todo: ToDo }; // Make sure uid is included
+  const collectionRef = collection(db, "todos");
   try {
     await addDoc(collectionRef, ToDos);
-    console.log("serviceSaveToDo() triggerd");
+    console.log("ToDo added successfully");
   } catch (error) {
-    console.log("error=> Inside serviceSaveToDo", error);
+    console.error("Error adding ToDo:", error);
   }
 }
