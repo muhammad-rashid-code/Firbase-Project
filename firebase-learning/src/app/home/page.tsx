@@ -12,7 +12,15 @@ export default function Home() {
   return (
     <>
       <h1>Welcome Home</h1>
-      <p>Welcome {user?.email?.split("@")[0]}</p>
+      <p>
+        Welcome {user?.email?.split("@")[0]}{" "}
+        <ButtonComponents
+          btnLabel={"Signout"}
+          btnHandler={() => {
+            serviceSignOut();
+          }}
+        />
+      </p>
       <br />
       <br />
       <label htmlFor="todoHuS">Add ToDo:</label>
@@ -31,12 +39,6 @@ export default function Home() {
       />
       <br />
       <br />
-      <ButtonComponents
-        btnLabel={"Signout"}
-        btnHandler={() => {
-          serviceSignOut();
-        }}
-      />
     </>
   );
 }
