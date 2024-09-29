@@ -28,7 +28,7 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
 
 export async function serviceSaveToDo(ToDo: string) {
   const UserUid = auth.currentUser?.uid;
-  const ToDos = { todo: ToDo, uid: UserUid };
+  const ToDos = { ToDo, UserUid };
   let collectionRef = collection(db, "todos");
   try {
     await addDoc(collectionRef, ToDos);
