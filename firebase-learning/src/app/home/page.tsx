@@ -20,8 +20,28 @@ export default function Home() {
   const [todoHuS, setTodoHuS] = useState<string>("");
   const [allTodosHuS, setAllTodosHuS] = useState<DocumentData[]>([]);
 
+  let readTodosRealtime: Unsubscribe;
+
+  const fetchTodosRealtime = () => {
+    let collectionRef = collection(db, "todos");
+    let currentUserUid = auth.currentUser?.uid;
+    if (!currentUserUid) return; // Ensure user is authenticated
+
+    let condition = where("uid", "==", currentUserUid);
+    let q = query(collectionRef, condition);
+
+    readTodosRealtime = onSnapshot(q, (querySnapShot) => {
+      const newTodos = querySnapShot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setAllTodosHuS(newTodos); // Set all todos at once
+    });
+  };
+
+  // Ensure readTodosRealtime is initialized before use
   useEffect(() => {
-    let detacOnAuthStateChangedListner = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchTodosRealtime();
       }
@@ -30,32 +50,11 @@ export default function Home() {
     return () => {
       if (readTodosRealtime) {
         readTodosRealtime();
-        detacOnAuthStateChangedListner();
       }
+      unsubscribeAuth();
     };
   }, []);
 
-  let readTodosRealtime: Unsubscribe;
-
-  const fetchTodosRealtime = () => {
-    let collectionRef = collection(db, "todos");
-    let currentUserUid = auth.currentUser?.uid;
-    let condition = where("uid", "==", currentUserUid);
-    let q = query(collectionRef, condition);
-
-    let allTodosClone = [...allTodosHuS];
-
-    readTodosRealtime = onSnapshot(q, (querySnapShot) => {
-      querySnapShot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-          let todo = change.doc.data();
-          todo.id = change.doc.id;
-          allTodosClone.push(todo);
-          setAllTodosHuS([...allTodosClone]);
-        }
-      });
-    });
-  };
   return (
     <>
       <h1>Welcome Home</h1>
@@ -84,6 +83,11 @@ export default function Home() {
           serviceSignOut();
         }}
       />
+      {allTodosHuS.length > 0 ? (
+        allTodosHuS.map(({ id, todo }) => <h1 key={id}>{todo}</h1>)
+      ) : (
+        <h1>No Todos Available</h1>
+      )}
     </>
   );
 }
