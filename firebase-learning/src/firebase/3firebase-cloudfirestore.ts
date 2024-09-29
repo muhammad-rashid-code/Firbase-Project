@@ -8,8 +8,8 @@ import {
 import { app } from "./1firebaseconfig";
 import { getAuth } from "firebase/auth";
 
-const db = getFirestore(app);
-const auth = getAuth(app);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
 type ServiceSaveUserType = {
   email: string;
@@ -28,7 +28,7 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
 
 export async function serviceSaveToDo(ToDo: string) {
   const UserUid = auth.currentUser?.uid;
-  const ToDos = { ToDo, UserUid };
+  const ToDos = { todo: ToDo, uid: UserUid };
   let collectionRef = collection(db, "todos");
   try {
     await addDoc(collectionRef, ToDos);
