@@ -26,17 +26,17 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
   }
 }
 
-// export async function serviceSaveToDo(ToDo: string) {
-//   const UserUid = auth.currentUser?.uid;
-//   const ToDos = { ToDo, UserUid };
-//   let collectionRef = collection(db, "todos");
-//   try {
-//     await addDoc(collectionRef, ToDos);
-//     console.log("serviceSaveToDo() triggerd");
-//   } catch (error) {
-//     console.log("error=> Inside serviceSaveToDo", error);
-//   }
-// }
+export async function serviceSaveToDo(ToDo: string) {
+  const UserUid = auth.currentUser?.uid;
+  const ToDos = { todo: ToDo, uid: UserUid };
+  let collectionRef = collection(db, "todos");
+  try {
+    await addDoc(collectionRef, ToDos);
+    console.log("serviceSaveToDo() triggerd");
+  } catch (error) {
+    console.log("error=> Inside serviceSaveToDo", error);
+  }
+}
 
 ///
 
@@ -46,14 +46,14 @@ export async function serviceSaveUser(userCf: ServiceSaveUserType) {
 
 // Here's how your serviceSaveToDo should look:
 
-export async function serviceSaveToDo(ToDo: string) {
-  const UserUid = auth.currentUser?.uid;
-  const ToDos = { uid: UserUid, todo: ToDo }; // Make sure uid is included
-  const collectionRef = collection(db, "todos");
-  try {
-    await addDoc(collectionRef, ToDos);
-    console.log("ToDo added successfully");
-  } catch (error) {
-    console.error("Error adding ToDo:", error);
-  }
-}
+// export async function serviceSaveToDo(ToDo: string) {
+//   const UserUid = auth.currentUser?.uid;
+//   const ToDos = { uid: UserUid, todo: ToDo }; // Make sure uid is included
+//   const collectionRef = collection(db, "todos");
+//   try {
+//     await addDoc(collectionRef, ToDos);
+//     console.log("ToDo added successfully");
+//   } catch (error) {
+//     console.error("Error adding ToDo:", error);
+//   }
+// }
