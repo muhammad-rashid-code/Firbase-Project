@@ -3,12 +3,57 @@
 import { AuthContextExport } from "@/context/auth-context";
 import ButtonComponents from "../components/page";
 import { serviceSignOut } from "@/firebase/2firebase-auth";
-import { useState } from "react";
-import { serviceSaveToDo } from "@/firebase/3firebase-cloudfirestore";
+import { useEffect, useState } from "react";
+import { auth, db, serviceSaveToDo } from "@/firebase/3firebase-cloudfirestore";
+import {
+  collection,
+  DocumentData,
+  onSnapshot,
+  query,
+  Unsubscribe,
+  where,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Home() {
   const { user } = AuthContextExport()!;
   const [todoHuS, setTodoHuS] = useState<string>("");
+  const [allTodos, setAllTodos] = useState<DocumentData[]>([]);
+  useEffect(() => {
+    let detachOnAuthStateListner = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchTodosRealtime();
+      }
+    });
+
+    return () => {
+      if (readTodosRealtime) {
+        readTodosRealtime();
+        detachOnAuthStateListner();
+      }
+    };
+  }, []);
+
+  let readTodosRealtime: Unsubscribe;
+
+  const fetchTodosRealtime = () => {
+    let collectionRef = collection(db, "todos");
+    let currentUserUid = auth.currentUser?.uid;
+    let condition = where("uid", "==", currentUserUid);
+    let q = query(collectionRef, condition);
+    let allTodosClone = [...allTodos];
+
+    readTodosRealtime = onSnapshot(q, (querySnapShot) => {
+      querySnapShot.docChanges().forEach((chnge) => {
+        if (chnge.type === "added") {
+          let todo = chnge.doc.data();
+          todo.id = chnge.doc.id;
+          allTodosClone.push(todo);
+          setAllTodos([...allTodosClone]);
+        }
+      });
+    });
+  };
   return (
     <>
       <h1>Welcome Home</h1>
@@ -37,6 +82,13 @@ export default function Home() {
           serviceSignOut();
         }}
       />
+      {allTodos.length > 0 ? (
+        allTodos.map(({ todo }) => <h1>{todo}</h1>)
+      ) : (
+        <>
+          <p>there is no todo</p>
+        </>
+      )}
     </>
   );
 }
