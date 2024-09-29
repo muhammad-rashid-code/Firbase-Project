@@ -317,7 +317,7 @@ export default function Home() {
         allTodoHuS.map(({ id, todo }) => (
           <div key={id}>
             <h1>
-              {todo}
+              {todo}{" "}
               <ButtonComponents
                 btnLabel={"Edit"}
                 btnHandler={() => {
@@ -325,7 +325,7 @@ export default function Home() {
                   setCurrentTodoId(id);
                   setTodoHuS(todo);
                 }}
-              />
+              />{" "}
               <ButtonComponents
                 btnLabel={"Delete"}
                 btnHandler={() => handleDeleteTodo(id)}
