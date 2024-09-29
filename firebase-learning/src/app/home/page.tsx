@@ -13,9 +13,11 @@ import {
   onSnapshot,
   query,
   Unsubscribe,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { todo } from "node:test";
 
 export default function Home() {
   const { user } = AuthContextExport()!;
@@ -64,6 +66,24 @@ export default function Home() {
       console.error("Error deleting todo:", error);
     }
   };
+
+  const handleEditTodo = async () => {
+    if (currentTodoId) {
+      try {
+        await updateDoc(doc(db, "todos", currentTodoId), { todo: todoHuS });
+        setAllTodosHuS((prev) =>
+          prev.map((todo) =>
+            todo.id === currentTodoId ? { ...todo, todo: todoHuS } : todo
+          )
+        );
+        setEditModeHuS(false);
+        setCurrentTodoId("");
+        setTodoHuS("");
+      } catch (error) {
+        console.error("Error updating todo:", error);
+      }
+    }
+  };
   return (
     <>
       <h1>Welcome Home</h1>
@@ -86,11 +106,15 @@ export default function Home() {
         onChange={(e) => setTodoHuS(e.target.value)}
       />{" "}
       <ButtonComponents
-        btnLabel={"Add ToDo"}
-        btnHandler={() => {
-          serviceSaveToDo(todoHuS);
-          setTodoHuS("");
-        }}
+        btnLabel={editModeHuS ? "Save Changes" : "Add ToDo"}
+        btnHandler={
+          editModeHuS
+            ? handleEditTodo
+            : () => {
+                serviceSaveToDo(todoHuS);
+                setTodoHuS("");
+              }
+        }
       />
       <br />
       <br />
@@ -99,6 +123,14 @@ export default function Home() {
           <div key={id}>
             <h1>
               {todo}{" "}
+              <ButtonComponents
+                btnLabel={"Edit"}
+                btnHandler={() => {
+                  setEditModeHuS(true);
+                  setCurrentTodoId(id);
+                  setTodoHuS(todo);
+                }}
+              />{" "}
               <ButtonComponents
                 btnLabel={"Delete"}
                 btnHandler={() => {
