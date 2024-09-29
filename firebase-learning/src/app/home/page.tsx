@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { auth, db, serviceSaveToDo } from "@/firebase/3firebase-cloudfirestore";
 import {
   collection,
+  deleteDoc,
+  doc,
   DocumentData,
   onSnapshot,
   query,
@@ -54,6 +56,14 @@ export default function Home() {
     return unsubscirbe;
   };
 
+  const deleteTodo = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "todos", id));
+      setAllTodosHuS((prev) => prev.filter((todo) => todo.id !== id));
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
   return (
     <>
       <h1>Welcome Home</h1>
@@ -87,7 +97,15 @@ export default function Home() {
       {allTodosHuS.length > 0 ? (
         allTodosHuS.map(({ id, todo }) => (
           <div key={id}>
-            <h1>{todo}</h1>
+            <h1>
+              {todo}{" "}
+              <ButtonComponents
+                btnLabel={"Delete"}
+                btnHandler={() => {
+                  deleteTodo(id);
+                }}
+              />
+            </h1>
           </div>
         ))
       ) : (
