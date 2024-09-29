@@ -3,12 +3,57 @@
 import { AuthContextExport } from "@/context/auth-context";
 import ButtonComponents from "../components/page";
 import { serviceSignOut } from "@/firebase/2firebase-auth";
-import { useState } from "react";
-import { serviceSaveToDo } from "@/firebase/3firebase-cloudfirestore";
+import { useEffect, useState } from "react";
+import { auth, db, serviceSaveToDo } from "@/firebase/3firebase-cloudfirestore";
+import {
+  collection,
+  DocumentData,
+  onSnapshot,
+  query,
+  Unsubscribe,
+  where,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Home() {
   const { user } = AuthContextExport()!;
   const [todoHuS, setTodoHuS] = useState<string>("");
+  const [allTodosHuS, setAllTodosHuS] = useState<DocumentData[]>([]);
+  const [editModeHuS, setEditModeHuS] = useState<boolean>(false);
+  const [currentTodoId, setCurrentTodoId] = useState<string>("");
+  useEffect(() => {
+    const detachOnAuthStateListener: Unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        if (user) {
+          fetchTodosRealtime();
+        } else {
+          setAllTodosHuS([]);
+        }
+      }
+    );
+    return () => detachOnAuthStateListener();
+  }, []);
+
+  const fetchTodosRealtime = () => {
+    const collectionRef = collection(db, "todos");
+    const currentUserUid = auth.currentUser?.uid;
+    const condition = where("uid", "==", currentUserUid);
+    let q = query(collectionRef, condition);
+
+    const unsubscirbe: Unsubscribe = onSnapshot(q, (querySnapShot) => {
+      const newTodos: DocumentData[] = [];
+      querySnapShot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const todo = { ...change.doc.data(), id: change.doc.id };
+          newTodos.push(todo);
+        }
+      });
+      setAllTodosHuS((prev) => [...prev, ...newTodos]);
+    });
+    return unsubscirbe;
+  };
+
   return (
     <>
       <h1>Welcome Home</h1>
@@ -39,6 +84,15 @@ export default function Home() {
       />
       <br />
       <br />
+      {allTodosHuS.length > 0 ? (
+        allTodosHuS.map(({ id, todo }) => (
+          <div key={id}>
+            <h1>{todo}</h1>
+          </div>
+        ))
+      ) : (
+        <h1>Threre are no todos</h1>
+      )}
     </>
   );
 }
